@@ -4,15 +4,17 @@ dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const express = require("express")
 const dontenv = require("dotenv");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 dontenv.config();
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.9opu1fq.mongodb.net/?appName=Cluster0`;
+const uri =  process.env.MONGODB_URI;
 
 const app = express()
 
 const PORT = process.env.PORT;
+
+
 app.use(cors());
 app.use(express.json());
 const client = new MongoClient(uri, {
@@ -33,6 +35,20 @@ async function run() {
     const facilityCollection = db.collection("facilities");
   
 
+app.get("/facility", async (req, res) => {
+      const result = await facilityCollection.find().toArray();
+      res.json(result);
+    });
+
+   app.get("/facility/:id", async (req, res) => {
+      const { id } = req.params;
+
+      const result = await facilityCollection.findOne({
+        _id: new ObjectId(id),
+      });
+
+      res.json(result);
+    });
 
 app.post("/facility", async (req, res) => {
       const facilityData = req.body;
@@ -41,6 +57,20 @@ app.post("/facility", async (req, res) => {
 
       res.json(result);
     });
+
+    app.patch("/facility/:id", async (req, res) => {
+      const { id } = req.params;
+      const updatedData = req.body;
+      console.log(updatedData);
+
+      const result = await facilityCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedData },
+      );
+
+      res.json(result);
+    });
+
 
 
 
