@@ -33,7 +33,7 @@ async function run() {
 
  const db = client.db("sportnest");
     const facilityCollection = db.collection("facilities");
-  
+    const bookingCollection = db.collection("bookings");
 
 app.get("/facility", async (req, res) => {
       const result = await facilityCollection.find().toArray();
@@ -84,6 +84,12 @@ app.post("/facility", async (req, res) => {
     });
 
 
+  app.post("/booking", async (req, res) => {
+      const bookingData = req.body;
+      const result = await bookingCollection.insertOne(bookingData);
+
+      res.json(result);
+    });
 
 
 
