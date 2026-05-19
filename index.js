@@ -63,6 +63,10 @@ app.post("/facility", async (req, res) => {
       const updatedData = req.body;
       console.log(updatedData);
 
+
+ 
+
+    
       const result = await facilityCollection.updateOne(
         { _id: new ObjectId(id) },
         { $set: updatedData },
@@ -71,7 +75,13 @@ app.post("/facility", async (req, res) => {
       res.json(result);
     });
 
-
+  app.delete("/facility/:id", async (req, res) => {
+      const { id } = req.params;
+      const result = await facilityCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+      res.json(result);
+    });
 
 
 
