@@ -59,10 +59,7 @@ async function run() {
     const facilityCollection = db.collection("facilities");
     const bookingCollection = db.collection("bookings");
 
-app.get("/facility", async (req, res) => {
-      const result = await facilityCollection.find().toArray();
-      res.json(result);
-    });
+
 
     app.get("/featured", async (req, res) => {
       const result = await facilityCollection.find().limit(4).toArray()
@@ -77,6 +74,35 @@ app.get("/facility", async (req, res) => {
 
       res.json(result);
     });
+
+   app.get("/facility", async (req, res) => {
+  try {
+    const { search, sportType } = req.query;
+
+    let query = {};
+
+    if (search) {
+      query.facilityName = {
+        $regex: search,
+        $options: "i",
+      };
+    }
+
+    if (sportType) {
+      query.facilityType = {
+        $regex: sportType,
+        $options: "i",
+      };
+    }
+
+    const result = await facilityCollection.find(query).toArray();
+
+    res.send(result);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({ message: "Server Error" });
+  }
+});
 
 app.post("/facility", async (req, res) => {
       const facilityData = req.body;
