@@ -55,16 +55,13 @@ async function run() {
 
 
 
- const db = client.db("sportnest");
-    const facilityCollection = db.collection("facilities");
-    const bookingCollection = db.collection("bookings");
+ const db = client.db("sportnestapp");
+    const facilityCollection = db.collection("facilitiescol");
+    const bookingCollection = db.collection("bookingscol");
 
 
 
-    app.get("/featured", async (req, res) => {
-      const result = await facilityCollection.find().limit(4).toArray()
-      res.json(result)
-    })
+   
    app.get("/facility/:id",  verifyToken, async (req, res) => {
       const { id } = req.params;
 
@@ -161,6 +158,68 @@ app.post("/facility", async (req, res) => {
       res.json(result);
     });
 
+    // manage my facilities section 
+
+    app.get("/manage-my-facilities/:email", async (req, res) => {
+  const { email } = req.params;
+
+  const result = await facilityCollection
+    .find({ ownerEmail: email })
+    .toArray();
+
+  res.send(result);
+});
+app.delete(
+  "/manage-my-facilities/:id/:email",
+  async (req, res) => {
+    const { id, email } = req.params;
+
+    const result = await facilityCollection.deleteOne({
+      _id: new ObjectId(id),
+      ownerEmail: email,
+    });
+
+    res.send(result);
+  }
+);
+// app.patch(
+//   "/manage-my-facilities/:id/:email",
+//   async (req, res) => {
+//     try {
+//       const { id, email } = req.params;
+//       const updatedFacility = req.body;
+
+//       // Prevent ownerEmail from being changed
+//       delete updatedFacility.ownerEmail;
+
+//       const result = await facilityCollection.updateOne(
+//         {
+//           _id: new ObjectId(id),
+//           ownerEmail: email,
+//         },
+//         {
+//           $set: updatedFacility,
+//         }
+//       );
+
+//       res.send(result);
+//     } catch (error) {
+//       res.status(500).send({
+//         success: false,
+//         message: error.message,
+//       });
+//     }
+//   }
+// );
+app.get("/manage-my-facilities/facility/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const facility = await facilityCollection.findOne({
+    _id: new ObjectId(id),
+  });
+
+  res.send(facility);
+});
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
